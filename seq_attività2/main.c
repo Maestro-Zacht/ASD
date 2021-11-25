@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define FILENAME "att2.txt"
+#define FILENAME "att.txt"
 
 struct activity {
 	int start, end;
@@ -31,7 +31,7 @@ void sort_activities(activity_l acts) {
 	for (i = 0; i < acts.N - 1 && continua; i++) {
 		continua = 0;
 		for (j = 0; j < last_swap; j++) {
-			if (acts.activities[j].start > acts.activities[j+1].start || (acts.activities[j].start == acts.activities[j + 1].start && acts.activities[j].end > acts.activities[j + 1].end)) {
+			if (acts.activities[j].end > acts.activities[j+1].end) {
 				continua = 1;
 				tmp = acts.activities[j];
 				acts.activities[j] = acts.activities[j + 1];
@@ -51,7 +51,7 @@ void attPrint(activity_l acts, int* previous, int index) {
 
 
 void attSel(activity_l activities) {
-	int i, j, last = 1, current_duration, * lenghts = (int*)malloc(activities.N * sizeof(int)), * previous = (int*)malloc(activities.N * sizeof(int));
+	int i, j, last = 0, current_duration, * lenghts = (int*)malloc(activities.N * sizeof(int)), * previous = (int*)malloc(activities.N * sizeof(int));
 	lenghts[0] = activities.activities[0].end - activities.activities[0].start;
 	previous[0] = -1;
 
@@ -59,8 +59,8 @@ void attSel(activity_l activities) {
 		current_duration = activities.activities[i].end - activities.activities[i].start;
 		lenghts[i] = current_duration;
 		previous[i] = -1;
-		for (j = 0; j < i; j++) {
-			if (activities.activities[j].end <= activities.activities[i].start && lenghts[i] < current_duration + lenghts[j]) {
+		for (j = 0; j < i && activities.activities[j].end <= activities.activities[i].start; j++) {
+			if (lenghts[i] < current_duration + lenghts[j]) {
 				lenghts[i] = current_duration + lenghts[j];
 				previous[i] = j;
 			}

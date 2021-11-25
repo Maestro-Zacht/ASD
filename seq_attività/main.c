@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define FILENAME "att2.txt"
+#define FILENAME "att.txt"
 
 typedef struct {
 	int s, f;
