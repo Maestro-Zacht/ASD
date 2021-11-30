@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define FILENAME "att2.txt"
+#define FILENAME "att.txt"
 
 struct activity {
 	int start, end;
@@ -44,12 +44,12 @@ void sort_activities(activity_l acts) {
 }
 
 int find_last_compat_act(activity_l activities, int N, int value) {
+	int right, left = 0, medium, i;
 	if (N > activities.N)
 		N = activities.N;
+	right = N - 1;
 
-	int right = N - 1, left = 0, medium, i;
-
-	while (left < right) {
+	while (left <= right) {
 		medium = left + (right - left) / 2;
 		if (activities.activities[medium].end == value) {
 			for (i = medium + 1; i < N && activities.activities[i].end == value; i++);
@@ -58,17 +58,12 @@ int find_last_compat_act(activity_l activities, int N, int value) {
 
 		if (activities.activities[medium].end < value)
 			left = medium + 1;
+		else if (activities.activities[medium - 1].end <= value)
+			return medium - 1;
 		else
 			right = medium - 1;
 	}
-	if (activities.activities[left].end > value && activities.activities[right].end <= value)
-		return right;
-	else if (activities.activities[left].end <= value)
-		return left;
-	else if (right > 0 && activities.activities[right - 1].end <= value)
-		return right - 1;
-	else
-		return -1;
+	return -1;
 }
 
 void attPrint(activity_l acts, int* previous, int* lenghts, int index) {
