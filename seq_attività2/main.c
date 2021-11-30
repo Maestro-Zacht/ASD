@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define FILENAME "att.txt"
+#define FILENAME "att2.txt"
 
 struct activity {
 	int start, end;
@@ -25,22 +25,46 @@ activity_l leggiFile(const FILE* infile) {
 	return act;
 }
 
-void sort_activities(activity_l acts) {
-	int i, j, continua = 1, current_swap = -1, last_swap = acts.N - 1;
-	struct activity tmp;
-	for (i = 0; i < acts.N - 1 && continua; i++) {
-		continua = 0;
-		for (j = 0; j < last_swap; j++) {
-			if (acts.activities[j].end > acts.activities[j+1].end) {
-				continua = 1;
-				tmp = acts.activities[j];
-				acts.activities[j] = acts.activities[j + 1];
-				acts.activities[j + 1] = tmp;
-				current_swap = j;
-			}
-		}
-		last_swap = current_swap;
+
+void Merge(activity_l activities, activity_l aux, int left, int center, int right) {
+	int i = left, j = center + 1, k = 0;
+
+	while (i <= center && j <= right) {
+		if (activities.activities[i].end <= activities.activities[j].end)
+			aux.activities[k++] = activities.activities[i++];
+		else
+			aux.activities[k++] = activities.activities[j++];
 	}
+
+	while (i <= center)
+		aux.activities[k++] = activities.activities[i++];
+
+	while (j <= right)
+		aux.activities[k++] = activities.activities[j++];
+
+
+	for (k = left; k <= right; k++)
+		activities.activities[k] = aux.activities[k - left];
+}
+
+void mergeSortR(activity_l activities, activity_l aux, int left, int right) {
+	int med = (left + right) / 2;
+	if (right > left) {
+		mergeSortR(activities, aux, left, med);
+		mergeSortR(activities, aux, med + 1, right);
+		Merge(activities, aux, left, med, right);
+	}
+}
+
+void mergesort_activities(activity_l activities) {
+	activity_l aux;
+
+	aux.N = activities.N;
+	aux.activities = (struct activity*)malloc(aux.N * sizeof(struct activity));
+
+	mergeSortR(activities, aux, 0, activities.N - 1);
+
+	free(aux.activities);
 }
 
 int find_last_compat_act(activity_l activities, int N, int value) {
@@ -109,7 +133,7 @@ int main() {
 	activity_l activities = leggiFile(infile);
 	fclose(infile);
 
-	sort_activities(activities);
+	mergesort_activities(activities);
 
 	attSel(activities);
 
