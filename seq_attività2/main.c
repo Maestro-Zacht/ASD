@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define FILENAME "att.txt"
+#define FILENAME "att2.txt"
 
 struct activity {
 	int start, end;
@@ -43,10 +43,39 @@ void sort_activities(activity_l acts) {
 	}
 }
 
-void attPrint(activity_l acts, int* previous, int index) {
+int find_last_compat_act(activity_l activities, int N, int value) {
+	if (N > activities.N)
+		N = activities.N;
+
+	int right = N - 1, left = 0, medium, i;
+
+	while (left < right) {
+		medium = left + (right - left) / 2;
+		if (activities.activities[medium].end == value) {
+			for (i = medium + 1; i < N && activities.activities[i].end == value; i++);
+			return i - 1;
+		}
+
+		if (activities.activities[medium].end < value)
+			left = medium + 1;
+		else
+			right = medium - 1;
+	}
+	if (activities.activities[left].end > value && activities.activities[right].end <= value)
+		return right;
+	else if (activities.activities[left].end <= value)
+		return left;
+	else if (right > 0 && activities.activities[right - 1].end <= value)
+		return right - 1;
+	else
+		return -1;
+}
+
+void attPrint(activity_l acts, int* previous, int* lenghts, int index) {
 	if (previous[index] != -1)
-		attPrint(acts, previous, previous[index]);
-	printf("(%d, %d) ", acts.activities[index].start, acts.activities[index].end);
+		attPrint(acts, previous, lenghts, previous[index]);
+	if (lenghts[index] != lenghts[previous[index]])
+		printf("(%d, %d) ", acts.activities[index].start, acts.activities[index].end);
 }
 
 
@@ -59,17 +88,24 @@ void attSel(activity_l activities) {
 		current_duration = activities.activities[i].end - activities.activities[i].start;
 		lenghts[i] = current_duration;
 		previous[i] = -1;
-		for (j = 0; j < i && activities.activities[j].end <= activities.activities[i].start; j++) {
-			if (lenghts[i] < current_duration + lenghts[j]) {
-				lenghts[i] = current_duration + lenghts[j];
+
+		j = find_last_compat_act(activities, i, activities.activities[i].start);
+		if (j != -1) {
+			if (lenghts[i - 1] > lenghts[j] + current_duration) {
+				previous[i] = i - 1;
+				lenghts[i] = lenghts[i - 1];
+			}
+			else {
 				previous[i] = j;
+				lenghts[i] = lenghts[j] + current_duration;
 			}
 		}
+
 		if (lenghts[last] < lenghts[i])
 			last = i;
 	}
 	printf("Una delle sequenze di attivita' con durata massima di %d e':\n", lenghts[last]);
-	attPrint(activities, previous, last);
+	attPrint(activities, previous, lenghts, last);
 }
 
 
