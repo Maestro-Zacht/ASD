@@ -81,50 +81,63 @@ int prog_check(programma_t prog) {
 	return avanti && indietro && due_elementi;
 }
 
-float prog_make_r(int n_diag, int pos, int direzione_prec, elementi_l elementi, programma_t prog, diagonale_t tmp_diag, float best_val_prog, float val_prog, float val_diag, int DD, int DP) {
-	int i;
-	float tmp_val, new_diag_val;
+float prog_make_r(int n_diag, int pos, int direzione_prec, elementi_l elementi, programma_t prog, programma_t tmp_prog, float best_val_prog, int DD, int DP) {
+	int i, j;
+	float tmp_val, new_diag_val, val_prog, val_diag;
 	
 	if (n_diag < NDIAGS) {
+		val_diag = diag_val(&tmp_prog->diagonali[n_diag], n_diag == NDIAGS - 1);
 		if (pos < MAXDIAGELEM) {
-			if (pos == 0)
-				tmp_diag.N = 0;
 			for (i = 0; i < elementi.N; i++) {
+				diag_add_elem(&tmp_prog->diagonali[n_diag], &elementi.elementi[i]);
 				if (
 					elementi.elementi[i].direzione_ingresso == direzione_prec &&
 					((pos == 0 && elementi.elementi[i].precedenza == 0) || (pos > 0 && elementi.elementi[i].precedenza == 1)) && 
-					elementi.elementi[i].valore + val_diag < DD && 
-					elementi.elementi[i].valore + val_prog < DP
+					diag_val(&tmp_prog->diagonali[n_diag], n_diag == NDIAGS - 1) < DD &&
+					prog_val(tmp_prog) < DP
 				) {
-					diag_add_elem(&tmp_diag, &elementi.elementi[i]);
-					new_diag_val = diag_val(&tmp_diag, n_diag == NDIAGS - 1);
+					new_diag_val = diag_val(&tmp_prog->diagonali[n_diag], n_diag == NDIAGS - 1);
 					tmp_val = new_diag_val - val_diag;
-					if (elementi.elementi[i].finale)
-						tmp_val = prog_make_r(n_diag + 1, 0, 1, elementi, prog, tmp_diag, best_val_prog, val_prog + tmp_val, 0, DD, DP);
-					else
-						tmp_val = prog_make_r(n_diag, pos + 1, elementi.elementi[i].direzione_uscita, elementi, prog, tmp_diag, best_val_prog, val_prog + tmp_val, new_diag_val, DD, DP);
+					if (!elementi.elementi[i].finale) {
+						tmp_val = prog_make_r(n_diag, pos + 1, elementi.elementi[i].direzione_uscita, elementi, prog, tmp_prog, best_val_prog, DD, DP);
 
+						if (tmp_val > best_val_prog)
+							best_val_prog = tmp_val;
+					}
+
+					tmp_val = prog_make_r(n_diag + 1, 0, 1, elementi, prog, tmp_prog, best_val_prog, DD, DP);
 					if (tmp_val > best_val_prog) {
 						best_val_prog = tmp_val;
-						if (pos == MAXDIAGELEM - 1 || elementi.elementi[i].finale)
-							prog->diagonali[n_diag] = tmp_diag;
 					}
-					diag_remove_last(&tmp_diag);
 				}
+				diag_remove_last(&tmp_prog->diagonali[n_diag]);
 			}
 		}
 		else
-			best_val_prog = prog_make_r(n_diag + 1, 0, 1, elementi, prog, tmp_diag, best_val_prog, val_prog, 0, DD, DP);
+			best_val_prog = prog_make_r(n_diag + 1, 0, 1, elementi, prog, tmp_prog, best_val_prog, DD, DP);
 	}
-	else if (!prog_check(prog))
-		best_val_prog = -1;
-
+	else {
+		val_prog = prog_val(tmp_prog);
+		if (!prog_check(tmp_prog))
+			best_val_prog = -1;
+		else if(val_prog > best_val_prog) {
+			best_val_prog = val_prog;
+			for (i = 0; i < NDIAGS; i++) {
+				prog->diagonali[i].N = tmp_prog->diagonali[i].N;
+				for (j = 0; j < tmp_prog->diagonali[i].N; j++) {
+					prog->diagonali[i].elementi[j] = tmp_prog->diagonali[i].elementi[j];
+				}
+			}
+		}
+	}
 	return best_val_prog;
 }
 
 float prog_make(programma_t prog, int DD, int DP, elementi_l elementi) {
-	diagonale_t tmp;
-	return prog_make_r(0, 0, 1, elementi, prog, tmp, 0, 0, 0, DD, DP);
+	programma_t tmp = prog_init();
+	float r = prog_make_r(0, 0, 1, elementi, prog, tmp, 0, DD, DP);
+	prog_free(tmp);
+	return r;
 }
 
 void prog_print(const FILE* fp, programma_t prog) {
@@ -133,4 +146,12 @@ void prog_print(const FILE* fp, programma_t prog) {
 		fprintf(fp, "Diagonale %d -> %f\n", i + 1, diag_val(&prog->diagonali[i], i == NDIAGS - 1));
 		diag_print(fp, prog->diagonali[i]);
 	}
+}
+
+float prog_val(programma_t prog) {
+	int i;
+	float r = 0;
+	for (i = 0; i < NDIAGS; i++)
+		r += diag_val(&prog->diagonali[i], i == NDIAGS - 1);
+	return r;
 }

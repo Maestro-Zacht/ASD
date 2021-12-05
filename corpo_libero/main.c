@@ -8,27 +8,32 @@
 int main() {
 	programma_t prog;
 	elementi_l elementi;
-	int DD, DP, np, i;
+	int DD, DP, retv, i;
 	float TOT_EXPECTED, TOT_CALC;
 	FILE* infile = fopen(ELEMFILENAME, "r");
 
 	elementi = elem_l_read(infile);
 	fclose(infile);
 
-	infile = fopen(TESTSETFILENAME, "r");
+	do {
+		do {
+			printf("Inserire DD e DP (0 per uscire): ");
+			retv = scanf("%d %d", &DD, &DP);
+			getchar();
+		} while (retv != 2 || DD < 0 || DP < 0);
 
-	while (!feof(infile) && fscanf(infile, "--- Test Case #%d ---\nDD = %d DP = %d\nTOT = %f", &np, &DD, &DP, &TOT_EXPECTED) == 4) {
-		prog = prog_init();
+		if (DD != 0 && DP != 0) {
+			prog = prog_init();
 
-		TOT_CALC = prog_make(prog, DD, DP, elementi);
+			TOT_CALC = prog_make(prog, DD, DP, elementi);
 
-		printf("Programma #%d\nTotale calcolato: %f\nTotale previsto: %f\n", np, TOT_CALC, TOT_EXPECTED);
+			printf("----------\nDD = %d DP = %d\nTotale calcolato: %f\n", DD, DP, TOT_CALC);
+			prog_print(stdout, prog);
+			printf("\n");
 
-		prog_print(stdout, prog);
-		printf("\n");
-
-		prog_free(prog);
-	}
+			prog_free(prog);
+		}
+	} while (DD != 0 && DP != 0);
 
 	fclose(infile);
 
