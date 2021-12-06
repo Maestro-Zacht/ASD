@@ -75,12 +75,7 @@ int find_last_compat_act(activity_l activities, int N, int value) {
 
 	while (left <= right) {
 		medium = left + (right - left) / 2;
-		if (activities.activities[medium].end == value) {
-			for (i = medium + 1; i < N && activities.activities[i].end == value; i++);
-			return i - 1;
-		}
-
-		if (activities.activities[medium].end < value)
+		if (activities.activities[medium].end <= value)
 			left = medium + 1;
 		else if (activities.activities[medium - 1].end <= value)
 			return medium - 1;
