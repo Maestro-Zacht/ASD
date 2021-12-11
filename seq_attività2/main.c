@@ -68,7 +68,7 @@ void mergesort_activities(activity_l activities) {
 }
 
 int find_last_compat_act(activity_l activities, int N, int value) {
-	int right, left = 0, medium, i;
+	int right, left = 0, medium;
 	if (N > activities.N)
 		N = activities.N;
 	right = N - 1;
