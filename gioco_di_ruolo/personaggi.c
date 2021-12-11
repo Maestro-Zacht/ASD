@@ -13,8 +13,13 @@ void pg_free(nodo_pg* nodo) {
 nodo_pg* pg_insert(personaggio_t dati, tabella_personaggi_t* tb_pg) {
 	nodo_pg* nodo = (nodo_pg*)malloc(sizeof(nodo_pg));
 	nodo->personaggio = dati;
-	nodo->next = tb_pg->head;
-	tb_pg->head = nodo;
+	nodo->next = NULL;
+	if (tb_pg->tail == NULL)
+		tb_pg->tail = tb_pg->head = nodo;
+	else {
+		tb_pg->tail->next = nodo;
+		tb_pg->tail = nodo;
+	}
 	return nodo;
 }
 
@@ -30,12 +35,20 @@ void pg_delete(int codice, tabella_personaggi_t* tb_pg) {
 	nodo_pg* prev = _pg_search(codice, tb_pg), *tmp;
 	if (prev == NULL) {
 		if (tb_pg->head != NULL) {
-			tmp = tb_pg->head->next;
-			pg_free(tb_pg->head);
-			tb_pg->head = tmp;
+			if (tb_pg->head == tb_pg->tail) {
+				free(tb_pg->head);
+				tb_pg->head = tb_pg->tail = NULL;
+			}
+			else {
+				tmp = tb_pg->head->next;
+				pg_free(tb_pg->head);
+				tb_pg->head = tmp;
+			}
 		}			
 	}
 	else if (prev->next != NULL) {
+		if (tb_pg->tail == prev->next)
+			tb_pg->tail = prev;
 		tmp = prev->next->next;
 		pg_free(prev->next);
 		prev->next = tmp;
@@ -177,7 +190,7 @@ tabella_personaggi_t pg_setup_from_file(const FILE* infile) {
 	if (infile == NULL || feof(infile))
 		exit(-1);
 
-	tb_pg.head  = tb_pg.NULLPG.classe = tb_pg.NULLPG.nome = NULL;
+	tb_pg.head = tb_pg.tail = tb_pg.NULLPG.classe = tb_pg.NULLPG.nome = NULL;
 	tb_pg.NULLPG.codice = tb_pg.NULLPG.statistiche.atk = tb_pg.NULLPG.statistiche.mag = tb_pg.NULLPG.statistiche.hp = tb_pg.NULLPG.statistiche.mp = tb_pg.NULLPG.statistiche.def = tb_pg.NULLPG.statistiche.spr = 0;
 
 	do {
@@ -205,5 +218,5 @@ void pg_free_list(tabella_personaggi_t* tb_pg) {
 		free(i->personaggio.classe);
 		free(i);
 	}
-	tb_pg->head = NULL;
+	tb_pg->head = tb_pg->tail = NULL;
 }

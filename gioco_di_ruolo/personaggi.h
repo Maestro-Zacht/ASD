@@ -21,7 +21,7 @@ typedef struct nodo_pg {
 } nodo_pg;
 
 typedef struct {
-	nodo_pg* head;
+	nodo_pg* head, *tail;
 	//int n_pg;
 	personaggio_t NULLPG;
 } tabella_personaggi_t;

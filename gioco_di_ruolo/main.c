@@ -78,7 +78,7 @@ int main() {
 				printf("Il personaggio non esiste\n");
 			else {
 				do {
-					printf("Confermare di voler eliminare il personaggio PG%d %s? (y/n): ", pg_selezionato->personaggio.codice, pg_selezionato->personaggio.nome);
+					printf("Confermare di voler eliminare il personaggio PG%04d %s? (y/n): ", pg_selezionato->personaggio.codice, pg_selezionato->personaggio.nome);
 					scanf("%c", &scelta);
 					getchar();
 				} while (scelta != 'y' && scelta != 'n' && scelta != 'Y' && scelta != 'N');
