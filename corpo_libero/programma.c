@@ -22,16 +22,13 @@ void diag_remove_last(diagonale_t* diag) {
 }
 
 float diag_val(diagonale_t* diag, int ultima) {
-	int i, flag = 0;
+	int i;
 	float r = 0;
 
-	for (i = 0; i < diag->N; i++) {
+	for (i = 0; i < diag->N; i++)
 		r += diag->elementi[i]->valore;
-		if (diag->elementi[i]->valore >= 8)
-			flag = 1;
-	}
 
-	if (ultima && flag)
+	if (ultima && diag->elementi[diag->N - 1] >= 8)
 		r *= 1.5;
 
 	return r;
