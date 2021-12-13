@@ -28,10 +28,17 @@ float diag_val(diagonale_t* diag, int ultima) {
 	for (i = 0; i < diag->N; i++)
 		r += diag->elementi[i]->valore;
 
-	if (ultima && diag->elementi[diag->N - 1] >= 8)
+	if (ultima && diag->elementi[diag->N - 1]->valore >= 8)
 		r *= 1.5;
 
 	return r;
+}
+
+int diag_diff(diagonale_t* diag) {
+	int i, diff = 0;
+	for (i = 0; i < diag->N; i++)
+		diff += diag->elementi[i]->difficoltà;
+	return diff;
 }
 
 void diag_print(const FILE* fp, diagonale_t diag) {
@@ -40,6 +47,13 @@ void diag_print(const FILE* fp, diagonale_t diag) {
 		fprintf(fp, "%s ", diag.elementi[i]->nome);
 
 	fprintf(fp, "\n");
+}
+
+int prog_diff(programma_t prog) {
+	int i, r = 0;
+	for (i = 0; i < NDIAGS; i++)
+		r += diag_diff(&prog->diagonali[i]);
+	return r;
 }
 
 programma_t prog_init() {
@@ -80,21 +94,18 @@ int prog_check(programma_t prog) {
 
 float prog_make_r(int n_diag, int pos, int direzione_prec, elementi_l elementi, programma_t prog, programma_t tmp_prog, float best_val_prog, int DD, int DP) {
 	int i, j;
-	float tmp_val, new_diag_val, val_prog, val_diag;
+	float tmp_val, val_prog;
 	
 	if (n_diag < NDIAGS) {
-		val_diag = diag_val(&tmp_prog->diagonali[n_diag], n_diag == NDIAGS - 1);
 		if (pos < MAXDIAGELEM) {
 			for (i = 0; i < elementi.N; i++) {
 				diag_add_elem(&tmp_prog->diagonali[n_diag], &elementi.elementi[i]);
 				if (
 					elementi.elementi[i].direzione_ingresso == direzione_prec &&
-					((pos == 0 && elementi.elementi[i].precedenza == 0) || (pos > 0 && elementi.elementi[i].precedenza == 1)) && 
-					diag_val(&tmp_prog->diagonali[n_diag], n_diag == NDIAGS - 1) < DD &&
-					prog_val(tmp_prog) < DP
+					(pos > 0 || (pos == 0 && elementi.elementi[i].precedenza == 0)) &&
+					diag_diff(&tmp_prog->diagonali[n_diag]) <= DD &&
+					prog_diff(tmp_prog) <= DP
 				) {
-					new_diag_val = diag_val(&tmp_prog->diagonali[n_diag], n_diag == NDIAGS - 1);
-					tmp_val = new_diag_val - val_diag;
 					if (!elementi.elementi[i].finale) {
 						tmp_val = prog_make_r(n_diag, pos + 1, elementi.elementi[i].direzione_uscita, elementi, prog, tmp_prog, best_val_prog, DD, DP);
 
@@ -139,8 +150,9 @@ float prog_make(programma_t prog, int DD, int DP, elementi_l elementi) {
 
 void prog_print(const FILE* fp, programma_t prog) {
 	int i;
+	fprintf(fp, "Difficolta' totale: %d\n", prog_diff(prog));
 	for (i = 0; i < NDIAGS; i++) {
-		fprintf(fp, "Diagonale %d -> %f\n", i + 1, diag_val(&prog->diagonali[i], i == NDIAGS - 1));
+		fprintf(fp, "Diagonale %d -> %f (%d)\n", i + 1, diag_val(&prog->diagonali[i], i == NDIAGS - 1), diag_diff(&prog->diagonali[i]));
 		diag_print(fp, prog->diagonali[i]);
 	}
 }
