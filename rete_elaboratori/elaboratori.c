@@ -45,9 +45,16 @@ int elab_get_index_bin(elaboratori_t elabs, const char* node_name) {
 	return -1;
 }
 
-char* elab_get_name(elaboratori_t elabs, int index) {
+const char* elab_get_name(elaboratori_t elabs, int index) {
 	if (index < elabs->V)
 		return elabs->tab_names[index].nome;
+	else
+		return NULL;
+}
+
+const char* elab_get_net(elaboratori_t elabs, int index) {
+	if (index < elabs->V)
+		return elabs->tab_names[index].rete;
 	else
 		return NULL;
 }
@@ -227,7 +234,7 @@ void elab_make_list_adj(elaboratori_t elabs) {
 void elab_reverse_print_adj_l(const FILE* fp, elaboratori_t elabs, link list, const char* node_start) {
 	if (list != NULL) {
 		elab_reverse_print_adj_l(fp, elabs, list->next, node_start);
-		fprintf(fp, "- %s --> %s (%d)\n", node_start, elab_get_name(elabs, list->v), list->weight);
+		fprintf(fp, "- %s ---> %s - %s (%d)\n", node_start, elab_get_name(elabs, list->v), elab_get_net(elabs, list->v), list->weight);
 	}
 }
 
@@ -235,15 +242,15 @@ void elab_print_edges(const FILE* fp, elaboratori_t elabs) {
 	int i, j;
 	if (elabs->list_adj == NULL) {
 		for (i = 0; i < elabs->V; i++) {
-			fprintf(fp, "----------\nNODO: %s\n", elab_get_name(elabs, i));
+			fprintf(fp, "----------\nNODO: %s - %s\n", elab_get_name(elabs, i), elab_get_net(elabs, i));
 			for (j = 0; j < elabs->V; j++)
 				if (elabs->mat_adj[i][j] != 0)
-					fprintf(fp, "- %s --> %s (%d)\n", elab_get_name(elabs, i), elab_get_name(elabs, j), elabs->mat_adj[i][j]);
+					fprintf(fp, "- %s --> %s - %s (%d)\n", elab_get_name(elabs, i), elab_get_name(elabs, j), elab_get_net(elabs, j), elabs->mat_adj[i][j]);
 		}
 	}
 	else {
 		for (i = 0; i < elabs->V; i++) {
-			fprintf(fp, "----------\nNODO: %s\n", elab_get_name(elabs, i));
+			fprintf(fp, "----------\nNODO: %s - %s\n", elab_get_name(elabs, i), elab_get_net(elabs, i));
 			elab_reverse_print_adj_l(fp, elabs, elabs->list_adj[i], elab_get_name(elabs, i));
 		}
 	}
