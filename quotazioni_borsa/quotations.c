@@ -69,9 +69,10 @@ void qts_insert_quotation(quotations_l quotations, quotation_t* quotation) {
 }
 
 quotation_t* search_r(link l, QTKEY key, link z) {
-	int cmp = datecmp(key, qt_key(l->qtp));
+	int cmp;
 	if (l == z)
 		return NULL;
+	cmp = datecmp(key, qt_key(l->qtp));
 	if (cmp == 0)
 		return l->qtp;
 	if (cmp < 0)
@@ -88,19 +89,6 @@ QTKEY key_min_r(link l, link z) {
 		return qt_key(l->qtp);
 	return key_min_r(l->l, z);
 }
-
-//void find_min_max_r(link l, float* min, float* max, link z) {
-//	float quotation;
-//	if (l != z) {
-//		quotation = qt_get_quotation(l->qtp);
-//		if (quotation > *max)
-//			*max = quotation;
-//		if (quotation < *min)
-//			*min = quotation;
-//		find_min_max_r(l->l, min, max, z);
-//		find_min_max_r(l->r, min, max, z);
-//	}
-//}
 
 void quotation_min_max_r(link l, QTKEY key_min, QTKEY key_max, float* min, float* max, link z) {
 	float quotation;
@@ -144,6 +132,7 @@ link rot_r(link l) {
 	l->l = help->r;
 	l->l->p = l;
 	help->r = l;
+	help->p = l->p;
 	l->p = help;
 	help->N = l->N;
 	l->N = 1;
@@ -157,6 +146,7 @@ link rot_l(link l) {
 	l->r = help->l;
 	l->r->p = l;
 	help->l = l;
+	help->p = l->p;
 	l->p = help;
 	help->N = l->N;
 	l->N = 1;
