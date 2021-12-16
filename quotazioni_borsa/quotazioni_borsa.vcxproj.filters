@@ -51,4 +51,9 @@
       <Filter>File di intestazione</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="F3.txt" />
+    <Text Include="F1.txt" />
+    <Text Include="F2.txt" />
+  </ItemGroup>
 </Project>

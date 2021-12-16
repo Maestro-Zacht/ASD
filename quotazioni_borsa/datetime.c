@@ -8,6 +8,14 @@ data_t date_read(const FILE* fp) {
 	return data;
 }
 
+void date_print(const FILE* fp, data_t data) {
+	fprintf(fp, "%04d/%02d/%02d", data.year, data.month, data.day);
+}
+
+void dateora_print(const FILE* fp, data_t data) {
+	fprintf(fp, "%04d/%02d/%02d %02d:%02d", data.year, data.month, data.day, data.time.hour, data.time.min);
+}
+
 int datecmp(data_t a, data_t b) {
 	if (a.year > b.year)
 		return 3;
@@ -45,4 +53,8 @@ int dateoracmp(data_t a, data_t b) {
 		return oracmp(a.time, b.time);
 	else
 		return dcmp;
+}
+
+int date_in_range(data_t min, data_t max, data_t cmp) {
+	return datecmp(min, cmp) <= 0 && datecmp(cmp, max) <= 0;
 }

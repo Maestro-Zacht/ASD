@@ -157,6 +157,11 @@
     <ClInclude Include="title.h" />
     <ClInclude Include="titles.h" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="F1.txt" />
+    <Text Include="F2.txt" />
+    <Text Include="F3.txt" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

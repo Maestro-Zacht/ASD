@@ -1,14 +1,14 @@
 #include "quotation.h"
 #include <stdlib.h>
 
-quotation_t qt_init(data_t date) {
-	quotation_t quotation;
+quotation_t* qt_init(data_t date) {
+	quotation_t* quotation = (quotation_t*)malloc(sizeof(quotation_t));
 
-	quotation.date = date;
-	quotation.N = 0;
-	quotation.maxN = 20;
-	quotation.transactions = (transaction_t*)malloc(quotation.maxN * sizeof(transaction_t));
-	if (quotation.transactions == NULL)
+	quotation->date = date;
+	quotation->N = 0;
+	quotation->maxN = 20;
+	quotation->transactions = (transaction_t*)malloc(quotation->maxN * sizeof(transaction_t));
+	if (quotation->transactions == NULL)
 		exit(-1);
 
 	return quotation;
@@ -16,6 +16,7 @@ quotation_t qt_init(data_t date) {
 
 void qt_free(quotation_t* quotation) {
 	free(quotation->transactions);
+	free(quotation);
 }
 
 void qt_insert_transaction(quotation_t* quotation, transaction_t transaction) {

@@ -16,7 +16,7 @@ typedef struct {
 	int N, maxN;
 } quotation_t;
 
-quotation_t qt_init(data_t date);
+quotation_t* qt_init(data_t date);
 void qt_free(quotation_t* quotation);
 
 void qt_insert_transaction(quotation_t* quotation, transaction_t transaction);
