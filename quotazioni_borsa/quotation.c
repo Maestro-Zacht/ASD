@@ -1,44 +1,45 @@
 #include "quotation.h"
 #include <stdlib.h>
 
-quotation_t* qt_init(data_t date) {
-	quotation_t* quotation = (quotation_t*)malloc(sizeof(quotation_t));
+quotation_t qt_init(data_t date) {
+	quotation_t quotation;
 
-	quotation->date = date;
-	quotation->N = 0;
-	quotation->maxN = 20;
-	quotation->transactions = (transaction_t*)malloc(quotation->maxN * sizeof(transaction_t));
-	if (quotation->transactions == NULL)
-		exit(-1);
-
+	quotation.date = date;
+	quotation.den = 0;
+	quotation.num = 0;
 	return quotation;
 }
 
-void qt_free(quotation_t* quotation) {
-	free(quotation->transactions);
-	free(quotation);
+quotation_t qt_null() {
+	quotation_t qtnull;
+	qtnull.den = 0;
+	qtnull.num = 0;
+	qtnull.date.year = qtnull.date.month = qtnull.date.day = -1;
+	return qtnull;
+}
+
+quotation_t qt_merge(quotation_t* quotation1, quotation_t* quotation2) {
+	quotation_t r;
+	if (datecmp(qt_key(quotation1), qt_key(quotation1)) == 0) {
+		r.date = quotation1->date;
+		r.num = quotation1->num + quotation2->num;
+		r.den = quotation1->den + quotation2->den;
+	}
+	else
+		r = qt_null();
+
+	return r;
 }
 
 void qt_insert_transaction(quotation_t* quotation, transaction_t transaction) {
 	if (datecmp(transaction.date, quotation->date) == 0) {
-		if (quotation->N == quotation->maxN) {
-			quotation->maxN += 20; // l'aumento di dimensione dipende dalla previsione del numero di dati, si potrebbe anche fare *= 2
-			quotation->transactions = (transaction_t*)realloc(quotation->transactions, quotation->maxN * sizeof(transaction_t));
-			if (quotation->transactions == NULL)
-				exit(-1);
-		}
-		quotation->transactions[quotation->N++] = transaction;
+		quotation->num += transaction.number * transaction.value;
+		quotation->den += transaction.number;
 	}
 }
 
 float qt_get_quotation(quotation_t* quotation) {
-	int i, number = 0;
-	float values = 0;
-	for (i = 0; i < quotation->N; i++) {
-		number += quotation->transactions[i].number;
-		values += quotation->transactions[i].number * quotation->transactions[i].value;
-	}
-	return values / number;
+	return (quotation->den != 0) ? quotation->num / quotation->den : 0;
 }
 
 QTKEY qt_key(quotation_t* quotation) {

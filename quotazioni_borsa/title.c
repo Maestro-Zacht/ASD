@@ -22,22 +22,18 @@ title_t title_init(TTLKEY key) {
 
 void title_read(const FILE* fp, title_t title) {
 	int i, N;
-	quotation_t* qtp;
+	quotation_t quotation;
 	transaction_t transaction;
 	if (title != NULL) {
 		if (fscanf(fp, "%d", &N) != 1)
 			exit(-1);
 		for (i = 0; i < N; i++) {
 			transaction.date = date_read(fp);
-			qtp = qts_search_quotation(title->quotations, transaction.date);
-			if (qtp == NULL) {
-				qtp = (quotation_t*)malloc(sizeof(quotation_t));
-				qtp = qt_init(transaction.date);
-				qts_insert_quotation(title->quotations, qtp);
-			}
+			quotation = qt_init(transaction.date);
 			if (fscanf(fp, "%f %d", &transaction.value, &transaction.number) != 2)
 				exit(-1);
-			qt_insert_transaction(qtp, transaction);
+			qt_insert_transaction(&quotation, transaction);
+			qts_insert_quotation(title->quotations, &quotation);
 		}
 	}
 }
@@ -76,5 +72,6 @@ void title_print_quotations_min_max(const FILE* fp, title_t title) {
 }
 
 void title_balance(title_t title, int soglia) {
-	qts_balance(title->quotations, soglia);
+	if (title != NULL)
+		qts_balance(title->quotations, soglia);
 }
