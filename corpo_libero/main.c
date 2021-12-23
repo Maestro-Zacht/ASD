@@ -9,7 +9,7 @@ int main() {
 	programma_t prog;
 	elementi_l elementi;
 	int DD, DP, retv, i;
-	float TOT_EXPECTED, TOT_CALC;
+	float TOT_CALC;
 	FILE* infile = fopen(ELEMFILENAME, "r");
 
 	elementi = elem_l_read(infile);
