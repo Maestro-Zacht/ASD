@@ -203,9 +203,9 @@ void height_min_max(link l, link z, int pos, int* min, int* max) {
 	}
 }
 
-void qts_balance(quotations_l quotations, int soglia) {	
+void qts_balance(quotations_l quotations, float soglia) {	
 	int min = quotations->root->N, max = -1;
 	height_min_max(quotations->root, quotations->z, 0, &min, &max);
-	if (min == 0 || max / min > soglia)
+	if (min == 0 || (float)max / min > soglia)
 		quotations->root = balance_r(quotations->root, quotations->z);
 }

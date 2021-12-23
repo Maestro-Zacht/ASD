@@ -15,4 +15,4 @@ void qts_quotation_min_max(quotations_l quotations, QTKEY key_min, QTKEY key_max
 QTKEY qts_key_min(quotations_l quotations);
 QTKEY qts_key_max(quotations_l quotations);
 
-void qts_balance(quotations_l quotations, int soglia);
+void qts_balance(quotations_l quotations, float soglia);

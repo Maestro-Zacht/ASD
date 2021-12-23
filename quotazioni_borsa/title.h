@@ -22,4 +22,4 @@ void title_print_quotation(const FILE* fp, title_t title, QTKEY key);
 void title_print_quotations_range(const FILE* fp, title_t title, QTKEY key_min, QTKEY key_max);
 void title_print_quotations_min_max(const FILE* fp, title_t title);
 
-void title_balance(title_t title, int soglia);
+void title_balance(title_t title, float soglia);

@@ -71,7 +71,7 @@ void title_print_quotations_min_max(const FILE* fp, title_t title) {
 	fprintf(fp, "Il valore minimo della quotazione del titolo e' stato %.2f, mentre il massimo e' stato %.2f\n", val_min, val_max);
 }
 
-void title_balance(title_t title, int soglia) {
+void title_balance(title_t title, float soglia) {
 	if (title != NULL)
 		qts_balance(title->quotations, soglia);
 }

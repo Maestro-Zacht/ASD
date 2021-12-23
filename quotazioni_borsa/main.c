@@ -12,7 +12,7 @@ int main() {
 	FILE* infile;
 	char filename[MAXFNLEN], titlename[MAXSTR];
 	enum comando scelta;
-	int soglia;
+	float soglia;
 	data_t data1, data2;
 	title_t titolo_sel = NULL;
 	titles_l titles = titles_init();
@@ -73,7 +73,7 @@ int main() {
 			break;
 		case balance:
 			printf("Inserire la soglia: ");
-			scanf("%d", &soglia);
+			scanf("%f", &soglia);
 			title_balance(titolo_sel, soglia);
 			break;
 		default:
