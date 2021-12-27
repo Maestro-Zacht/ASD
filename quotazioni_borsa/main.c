@@ -3,7 +3,7 @@
 #include "datetime.h"
 #include <stdio.h>
 
-#define MAXFNLEN 50
+#define MAXFNLEN 51
 
 enum comando { esci = 0, read_file, search_titolo, qt_search, daterange_search, min_max_search, balance };
 
@@ -31,7 +31,7 @@ int main() {
 		case esci:
 			break;
 		case read_file:
-			printf("Inserire il nome del file (max %d caratteri): ", MAXFNLEN);
+			printf("Inserire il nome del file (max %d caratteri): ", MAXFNLEN - 1);
 			scanf("%s", filename);
 			infile = fopen(filename, "r");
 
@@ -40,7 +40,7 @@ int main() {
 			fclose(infile);
 			break;
 		case search_titolo:
-			printf("Inserire il nome del titolo (max %d caratteri): ", MAXSTR);
+			printf("Inserire il nome del titolo (max %d caratteri): ", MAXSTR - 1);
 			scanf("%s", titlename);
 			titolo_sel = titles_search(titles, titlename);
 			if (titolo_sel == NULL)
