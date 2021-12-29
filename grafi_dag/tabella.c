@@ -4,7 +4,7 @@
 
 
 struct table_s {
-	char** tabella;		// implementazione tramite vettore perchè la dimensione del problema non richiede una struttura dati più flessibile come un DAG
+	char** tabella;		// implementazione tramite vettore perchè la dimensione del problema non richiede una struttura dati più flessibile come un BST
 	int maxN, N, sorted;
 };
 
