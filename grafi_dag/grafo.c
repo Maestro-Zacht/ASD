@@ -139,6 +139,7 @@ set_edgelist_t graph_convert_to_dag(graph_t graph) {
 			powerset_r(graph, i, 0, 0, elist, elist_set);
 		}
 	}
+	edgelist_free(elist);
 	return elist_set;
 }
 
@@ -214,9 +215,10 @@ void dag_print_max_dist(graph_t dag, const FILE* fp) {
 
 			for (j = i; j < dag->V; j++) {
 				v = topological_sort[j];
-				for (w = 0; w < dag->V; w++)
-					if (dag->mat_adj[v][w] != 0 && distances[w] < distances[v] + dag->mat_adj[v][w])
-						distances[w] = distances[v] + dag->mat_adj[v][w];
+				if (distances[v] != INT_MIN)
+					for (w = 0; w < dag->V; w++)
+						if (dag->mat_adj[v][w] != 0 && distances[w] < distances[v] + dag->mat_adj[v][w])
+							distances[w] = distances[v] + dag->mat_adj[v][w];
 			}
 
 			for (j = 0; j < dag->V; j++) {
