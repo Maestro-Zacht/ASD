@@ -203,6 +203,7 @@ void graph_print_edges(graph_t graph, edgelist_t elist, const FILE* fp) {
 
 void dag_print_max_dist(graph_t dag, const FILE* fp) {
 	int* topological_sort = dag_topological_sort(dag), i, j, v, w, * distances;
+	char* node_start;
 	distances = (int*)malloc(dag->V * sizeof(int));
 	
 	for (i = 0; i < dag->V; i++) {
@@ -221,8 +222,9 @@ void dag_print_max_dist(graph_t dag, const FILE* fp) {
 							distances[w] = distances[v] + dag->mat_adj[v][w];
 			}
 
+			node_start = st_search_by_index(dag->tab_names, topological_sort[i]);
 			for (j = 0; j < dag->V; j++) {
-				fprintf(fp, "Massima distanza da %s a %s: ", st_search_by_index(dag->tab_names, topological_sort[i]), st_search_by_index(dag->tab_names, j));
+				fprintf(fp, "Massima distanza da %s a %s: ", node_start, st_search_by_index(dag->tab_names, j));
 				if (distances[j] == INT_MIN)
 					fprintf(fp, "non raggiungibile\n");
 				else
