@@ -67,21 +67,22 @@ void merge_r(elementi_l v, elementi_l aux, int left, int right) {
 	}
 }
 
-void change_convenience(elemento_t* elemp, int tipologia, int ingresso, int uscita, int diff_cap, int iniziale, int finale, int diff_boost) {
-	elemp->conv = (diff_boost) ? elemp->valore / (elemp->difficoltà * elemp->difficoltà) : elemp->valore / elemp->difficoltà;
+void change_convenience(elemento_t* elemp, int tipologia, int ingresso, int uscita, int diff_cap, int iniziale, int finale, int diff_boost, int acr) {
+	elemp->conv = (diff_boost) ? elemp->valore / (elemp->difficoltà * elemp->difficoltà * elemp->difficoltà * elemp->difficoltà * elemp->difficoltà) : elemp->valore / elemp->difficoltà;
 
 	if (
 		tipologia != -1 && tipologia != elemp->tipologia ||
-		ingresso != elemp->direzione_ingresso ||
+		ingresso != -1 && ingresso != elemp->direzione_ingresso ||
 		elemp->difficoltà > diff_cap ||
 		iniziale && elemp->precedenza != 0 ||
 		!finale && elemp->finale == 1 ||
-		(uscita != -1) && uscita != elemp->direzione_uscita
+		(uscita != -1) && uscita != elemp->direzione_uscita ||
+		acr && elemp->tipologia == 0
 		)
 		elemp->conv = 0;
 }
 
-void elem_sort(elementi_l elem_l, int tipologia, int ingresso, int uscita, int diff_cap, int iniziale, int finale, int diff_boost) {
+void elem_sort(elementi_l elem_l, int tipologia, int ingresso, int uscita, int diff_cap, int iniziale, int finale, int diff_boost, int acr) {
 	elementi_l aux;
 	int i;
 	aux.N = elem_l.N;
@@ -89,7 +90,7 @@ void elem_sort(elementi_l elem_l, int tipologia, int ingresso, int uscita, int d
 	aux.elementi = (elemento_t*)malloc(aux.N * sizeof(elemento_t));
 
 	for (i = 0; i < elem_l.N; i++) 
-		change_convenience(&elem_l.elementi[i], tipologia, ingresso, uscita, diff_cap, iniziale, finale, diff_boost);
+		change_convenience(&elem_l.elementi[i], tipologia, ingresso, uscita, diff_cap, iniziale, finale, diff_boost, acr);
 
 	merge_r(elem_l, aux, 0, elem_l.N - 1);
 	free(aux.elementi);
@@ -103,10 +104,15 @@ void elem_sort(elementi_l elem_l, int tipologia, int ingresso, int uscita, int d
 //	return -1;
 //}
 //
-//int elem_easiest_initial(elementi_l elems, int uscita, int min_i) {
-//	int i;
-//	for (i = min_i; i < elems.N; i++)
-//		if (elems.elementi[i].precedenza == 0 && elems.elementi[i].direzione_uscita == uscita)
-//			return i;
-//	return -1;
-//}
+int elem_easiest_initial(elementi_l elems) {
+	int i, min = INT_MAX, i_min = -1;
+	for (i = 0; i < elems.N; i++) {
+		if (elems.elementi[i].precedenza == 0 && elems.elementi[i].difficoltà < min) {
+			min = elems.elementi[i].difficoltà;
+			i_min = i;
+		}
+	}
+	if (i_min != -1)
+		elems.elementi[i_min].conv = INT_MAX;
+	return i_min;
+}
