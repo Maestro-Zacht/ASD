@@ -53,6 +53,14 @@ void diag_print(const FILE* fp, diagonale_t diag) {
 	fprintf(fp, "\n");
 }
 
+int diag_check_acr(diagonale_t diag) {
+	int i;
+	for (i = 0; i < diag.N; i++)
+		if (diag.elementi[i].tipologia == 1 || diag.elementi[i].tipologia == 2)
+			return 1;
+	return 0;
+}
+
 int prog_check_tipo(programma_t prog, int tipo) {
 	int i, j;
 	for (i = 0; i < NDIAGS; i++)
@@ -112,8 +120,18 @@ void prog_make(programma_t prog, int DD, int DP, elementi_l elementi) {
 		diag_add_elem(&prog->diagonali[1], &elementi.elementi[0]);
 	}
 
-	elem_sort(elementi, -1, 1, -1, min(DD, DP / 3) / 2, 1, 0, 1);
-	diag_add_elem(&prog->diagonali[2], &elementi.elementi[0]);
+	elem_sort(elementi, 1, 1, -1, min(DD, DP / 3) / 2, 1, 0, 1);
+	if (elementi.elementi[0].conv > 0)
+		diag_add_elem(&prog->diagonali[2], &elementi.elementi[0]);
+	else {
+		elem_sort(elementi, 2, 1, -1, min(DD, DP / 3) / 2, 1, 0, 1);
+		if (elementi.elementi[0].conv > 0)
+			diag_add_elem(&prog->diagonali[2], &elementi.elementi[0]);
+		else {
+			elem_sort(elementi, -1, 1, -1, min(DD, DP / 3) / 2, 1, 0, 1);
+			diag_add_elem(&prog->diagonali[2], &elementi.elementi[0]);
+		}
+	}
 
 	inserito = 0;
 	if (!prog_check_tipo(prog, 1)) {
@@ -143,7 +161,7 @@ void prog_make(programma_t prog, int DD, int DP, elementi_l elementi) {
 		}
 	}
 
-	if(!prog_check_tipo(prog, 2)) {
+	if (!prog_check_tipo(prog, 2)) {
 		for (i = 0; i < NDIAGS && !inserito; i++) {
 			elem_sort(elementi, 2, prog->diagonali[i].elementi[0].direzione_uscita, -1, min(DD - diag_diff(&prog->diagonali[i]), DP - prog_diff(prog)), 0, -1, 0);
 			if (elementi.elementi[0].conv > 0) {
@@ -154,6 +172,23 @@ void prog_make(programma_t prog, int DD, int DP, elementi_l elementi) {
 		if (!inserito) {
 			printf("Non riuscito ad inserire avanti!");
 			exit(-1);
+		}
+	}
+
+	for (i = 0; i < NDIAGS; i++) {
+		if (!diag_check_acr(prog->diagonali[i])) {
+			elem_sort(elementi, 1, prog->diagonali[i].elementi[prog->diagonali[i].N - 1].direzione_uscita, -1, min(DP - prog_diff(prog), DD - diag_diff(&prog->diagonali[i])), 0, 0, 0);
+			if (elementi.elementi[0].conv > 0)
+				diag_add_elem(&prog->diagonali[i], &elementi.elementi[0]);
+			else {
+				elem_sort(elementi, 2, prog->diagonali[i].elementi[prog->diagonali[i].N - 1].direzione_uscita, -1, min(DP - prog_diff(prog), DD - diag_diff(&prog->diagonali[i])), 0, 0, 0);
+				if (elementi.elementi[0].conv > 0)
+					diag_add_elem(&prog->diagonali[i], &elementi.elementi[0]);
+				else {
+					printf("Non riuscito ad inserire acrobatico!");
+					exit(-1);
+				}
+			}
 		}
 	}
 
