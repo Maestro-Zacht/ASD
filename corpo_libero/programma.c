@@ -49,6 +49,22 @@ void diag_print(const FILE* fp, diagonale_t diag) {
 	fprintf(fp, "\n");
 }
 
+int diag_check_2_acr(diagonale_t diag) {
+	int i;
+	for (i = 0; i < diag.N - 1; i++)
+		if (diag.elementi[i]->tipologia != 0 && diag.elementi[i + 1]->tipologia != 0)
+			return 1;
+	return 0;
+}
+
+int diag_check_acr(diagonale_t diag) {
+	int i;
+	for (i = 0; i < diag.N; i++)
+		if (diag.elementi[i]->tipologia != 0)
+			return 1;
+	return 0;
+}
+
 int prog_diff(programma_t prog) {
 	int i, r = 0;
 	for (i = 0; i < NDIAGS; i++)
@@ -73,13 +89,13 @@ void prog_free(programma_t prog) {
 }
 
 int prog_check(programma_t prog) {
-	int i, j, avanti = 0, indietro = 0, due_elementi = 0;
+	int i, j, avanti = 0, indietro = 0, due_acr = 0;
 	for (i = 0; i < NDIAGS; i++) {
-		if (prog->diagonali[i].N < 1)
+		if (!diag_check_acr(prog->diagonali[i]))
 			return 0;
 
-		if (prog->diagonali[i].N > 1)
-			due_elementi = 1;
+		if (!due_acr && diag_check_2_acr(prog->diagonali[i]))
+			due_acr = 1;
 
 		for (j = 0; j < prog->diagonali[i].N; j++) {
 			if (prog->diagonali[i].elementi[j]->tipologia == 2)
@@ -89,7 +105,7 @@ int prog_check(programma_t prog) {
 		}
 	}
 
-	return avanti && indietro && due_elementi;
+	return avanti && indietro && due_acr;
 }
 
 float prog_make_r(int n_diag, int pos, int direzione_prec, elementi_l elementi, programma_t prog, programma_t tmp_prog, float best_val_prog, int DD, int DP) {
