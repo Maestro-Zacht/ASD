@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{f45230b0-903f-4109-bab4-6266cbcfddc6}</ProjectGuid>
-    <RootNamespace>esame_260121_18pt</RootNamespace>
+    <ProjectGuid>{558af9c6-228b-41e7-aab3-44923efc97ea}</ProjectGuid>
+    <RootNamespace>esame_220620</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -143,13 +143,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="grafo.c" />
     <ClCompile Include="main.c" />
-    <ClCompile Include="tabella.c" />
+    <ClCompile Include="schema.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="grafo.h" />
-    <ClInclude Include="tabella.h" />
+    <ClInclude Include="schema.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

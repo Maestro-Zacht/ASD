@@ -18,18 +18,12 @@
     <ClCompile Include="main.c">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="tabella.c">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="grafo.c">
+    <ClCompile Include="schema.c">
       <Filter>File di origine</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="tabella.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="grafo.h">
+    <ClInclude Include="schema.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
   </ItemGroup>
