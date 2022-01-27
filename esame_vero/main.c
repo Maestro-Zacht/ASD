@@ -18,14 +18,18 @@ int** leggiFile(FILE* fp, int* NR, int* NC) {
 }
 
 int verificaRegione(int** proposta, int** check, int** griglia, int r, int c, int NR, int NC) {
-	int i, j, n, l = 1;
+	int i, j, n, l;
 	if (griglia[r][c] == 1 && proposta[r][c] == -1) {
 		check[r][c] = 1;
 		return 1;
 	}
-	if (griglia[r][c] != 1 && proposta[r][c] != -1) { // cambiamento
+	if (griglia[r][c] != 1 && proposta[r][c] != -1) {
 		n = proposta[r][c];
-		for (i = 1; r + i < NR && proposta[r + i][c] == n; i++, l++); // cambiamento
+		for (i = 1; r + i < NR && proposta[r + i][c] == n; i++);
+		l = i;
+
+		if (c + l > NC)
+			return 0;
 
 		for (i = 0; i < l; i++) {
 			for (j = 0; j < l; j++) {
@@ -37,7 +41,6 @@ int verificaRegione(int** proposta, int** check, int** griglia, int r, int c, in
 			}
 		}
 
-		// aggiunta
 		for (i = 0; i < NR; i++) {
 			for (j = 0; j < NC; j++) {
 				if (proposta[i][j] == n && !((i >= r && i < r + l) && (j >= c && j < c + l))) {
@@ -49,6 +52,35 @@ int verificaRegione(int** proposta, int** check, int** griglia, int r, int c, in
 		return 1;
 	}
 	return 0;
+}
+
+int verifica2(int** griglia, int** proposta, int NR, int NC) {
+	int i, j, correct = 1, ** check = malloc(NR * sizeof(int*));
+
+	for (i = 0; i < NR; i++) {
+		check[i] = malloc(NC * sizeof(int));
+		for (j = 0; j < NC; j++) {
+			check[i][j] = 0;
+		}
+	}
+
+	for (i = 0; i < NR && correct; i++) {
+		for (j = 0; j < NC && correct; j++) {
+			if (check[i][j] == 0) {
+				if (verificaRegione(proposta, check, griglia, i, j, NR, NC) == 0) {
+					correct = 0;
+				}
+			}
+		}
+	}
+
+	for (i = 0; i < NR; i++) {
+		free(check[i]);
+	}
+
+	free(check);
+
+	return correct;
 }
 
 int verificaProposta(int** griglia, int NR, int NC) {
@@ -65,8 +97,8 @@ int verificaProposta(int** griglia, int NR, int NC) {
 	}
 	fclose(fp);
 
-	for (i = 0; i < NR && correct; i++) { // cambiamento
-		for (j = 0; j < NC && correct; j++) {	// cambiamento
+	for (i = 0; i < NR && correct; i++) {
+		for (j = 0; j < NC && correct; j++) {
 			if (check[i][j] == 0) {
 				if (verificaRegione(proposta, check, griglia, i, j, NR, NC) == 0) {
 					correct = 0;
@@ -98,7 +130,7 @@ int contaRegioni(int** proposta, int NR, int NC) {
 	return n + 1;
 }
 
-void scriviProposta(int** m, int NR, int NC) { // cambiamento
+void scriviProposta(int** m, int NR, int NC) {
 	int i, j;
 	FILE* fp = fopen("proposta.txt", "w");
 
@@ -111,7 +143,7 @@ void scriviProposta(int** m, int NR, int NC) { // cambiamento
 	fclose(fp);
 }
 
-void disp(int** griglia, int r, int c, int** sol, int** best, int NR, int NC) { // cambiamento
+void disp(int** griglia, int r, int c, int** sol, int** best, int NR, int NC) {
 	int i, j;
 
 	if (c >= NC) {
@@ -120,8 +152,7 @@ void disp(int** griglia, int r, int c, int** sol, int** best, int NR, int NC) { 
 	}
 
 	if (r >= NR) {
-		scriviProposta(sol, NR, NC);
-		if (verificaProposta(griglia, NR, NC)) {
+		if (verifica2(griglia, sol, NR, NC)) {
 			if (contaRegioni(sol, NR, NC) < contaRegioni(best, NR, NC)) {
 				for (i = 0; i < NR; i++)
 					for (j = 0; j < NC; j++)
@@ -138,7 +169,7 @@ void disp(int** griglia, int r, int c, int** sol, int** best, int NR, int NC) { 
 		}
 		else {
 			sol[r][c] = -1;
-			disp(griglia, r, c + 1, sol, best, NR, NC); // cambiamento
+			disp(griglia, r, c + 1, sol, best, NR, NC);
 		}
 	}
 }
@@ -154,7 +185,6 @@ int main() {
 	for (i = 0; i < NR; i++) {
 		sol[i] = malloc(NC * sizeof(int));
 		best[i] = malloc(NC * sizeof(int));
-		// aggiunta
 		for (j = 0; j < NC; j++)
 			best[i][j] = i * NC + j;
 	}
